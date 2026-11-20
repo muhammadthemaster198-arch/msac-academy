@@ -1,0 +1,7 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+:root { color-scheme: light; }
+body { @apply bg-paper text-navy font-sans antialiased; }
+:focus-visible { outline: 3px solid #FFC93C; outline-offset: 2px; }
+@keyframes pop { from { transform: translateY(14px) rotate(var(--r,0deg)); opacity: 0 } to { transform: translateY(0) rotate(var(--r,0deg)); opacity: 1 } }
+.pop { animation: pop .7s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d,0s); }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none } }
