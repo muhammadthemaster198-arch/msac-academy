@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { safeNext } from "@/lib/safe-next";
-// Email confirmation and password-reset links land here.
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get("code"), tokenHash = searchParams.get("token_hash"), type = searchParams.get("type");
-  const next = safeNext(searchParams.get("next"));
-  const supabase = createClient();
-  let failed = true;
-  if (tokenHash && type) failed = !!(await supabase.auth.verifyOtp({ type: type as EmailOtpType, token_hash: tokenHash })).error;
-  else if (code) failed = !!(await supabase.auth.exchangeCodeForSession(code)).error;
-  return NextResponse.redirect(`${origin}${failed ? "/login?error=link" : next}`);
+// Open /api/health on your deployed site to test the Supabase connection. Never prints keys.
+export async function GET() {
+  const env = { url: !!process.env.NEXT_PUBLIC_SUPABASE_URL, publishableKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY };
+  if (!env.url || !env.publishableKey) return NextResponse.json({ ok: false, env, error: "Missing environment variables" }, { status: 500 });
+  const { error } = await createClient().from("courses").select("id").limit(1);
+  return NextResponse.json({ ok: !error, env, database: error ? error.message : "reachable, tables found" }, { status: error ? 500 : 200 });
 }
